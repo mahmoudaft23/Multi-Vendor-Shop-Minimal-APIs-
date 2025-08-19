@@ -6,8 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // سجّل الـ Repository والخدمة في الـ DI
 builder.Services.AddSingleton<UserRepository>();
+builder.Services.AddSingleton<VendorApprovalRepository>();
+builder.Services.AddSingleton<HrEmployeeRepository>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<CreatuserService>();
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -35,6 +38,10 @@ using (var scope = app.Services.CreateScope())
 {
     var repo = scope.ServiceProvider.GetRequiredService<UserRepository>();
     repo.CreateTable();
+       var vendorRepo = scope.ServiceProvider.GetRequiredService<VendorApprovalRepository>();
+    vendorRepo.CreateTable();
+    var hr = scope.ServiceProvider.GetRequiredService<HrEmployeeRepository>();
+    vendorRepo.CreateTable();
 }
 
 var RootGroup = app.MapGroup("/api/v1");

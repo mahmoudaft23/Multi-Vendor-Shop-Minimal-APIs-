@@ -16,11 +16,11 @@ public static class RegisterEndpoints
 
             }
             
-             var cheackuder  =Creatusernew.Creatuser (dto.displayName,dto.email,dto.passwordHash);
+             var cheackuder  =Creatusernew.Creatuser (dto.displayName,dto.email,dto.passwordHash, dto.chosserole );
                  return cheackuder ? Results.Ok("Created") : Results.Unauthorized();
         });
 
         return group;
     }
 }
-public record registerDto(string displayName,string email, string passwordHash);
+public record registerDto(string displayName,string email, string passwordHash,string  chosserole );
