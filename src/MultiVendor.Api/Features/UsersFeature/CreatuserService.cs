@@ -25,7 +25,7 @@ public class CreatuserService
             return _repoVendor.AddVendor(id, displayName, email, passwordHash, createdAt);
         }
 
-        // لو ما كان Customer ولا Vendor
+      
         return false;
     }
 }

@@ -117,4 +117,31 @@ public class VendorApprovalRepository
 
         return cmd.ExecuteNonQuery() > 0;
     }
+    public List<VendorApprovalDto> GetAllVendors()
+{
+    var vendors = new List<VendorApprovalDto>();
+
+    using var conn = Database.GetConnection();
+    conn.Open();
+
+    string sql = "SELECT Id, Name, CreatedAt, Status, Email, PasswordHash FROM VendorsApproval";
+    using var cmd = new SqliteCommand(sql, conn);
+    using var reader = cmd.ExecuteReader();
+
+    while (reader.Read())
+    {
+        vendors.Add(new VendorApprovalDto
+        {
+            Id = reader.GetString(0),
+            Name = reader.GetString(1),
+            CreatedAt = DateTime.Parse(reader.GetString(2)),
+            Status = reader.GetString(3),
+            Email = reader.GetString(4),
+            PasswordHash = reader.GetString(5)
+        });
+    }
+
+    return vendors;
+}
+
 }
