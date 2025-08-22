@@ -10,8 +10,9 @@ builder.Services.AddSingleton<VendorApprovalRepository>();
 builder.Services.AddSingleton<HrEmployeeRepository>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<FetureHR>();
+builder.Services.AddSingleton<FetureVendor>();
 builder.Services.AddSingleton<CreatuserService>();
-
+builder.Services.AddSingleton<VendorRepository>();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -43,6 +44,8 @@ using (var scope = app.Services.CreateScope())
     vendorRepo.CreateTable();
     var hr = scope.ServiceProvider.GetRequiredService<HrEmployeeRepository>();
     hr.CreateTable();
+    var Vendors = scope.ServiceProvider.GetRequiredService<VendorRepository>();
+    Vendors.CreateTable();
 }
 
 var RootGroup = app.MapGroup("/api/v1");
@@ -50,7 +53,7 @@ var RootGroup = app.MapGroup("/api/v1");
 RootGroup.MapGroup("/auth").MapRegisterEndpoints()
                         .MapAuthEndpoints();
 
-//RootGroup.MapGroup("/vendor").MapVendorEndpoints();
+RootGroup.MapGroup("/vendor").MapVendorEndpoints();
 RootGroup.MapGroup("/hr").MapHrEndpoints();
 //RootGroup.MapGroup("/users").MapUserEndpoints();
 

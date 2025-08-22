@@ -71,39 +71,54 @@ public class VendorApprovalRepository
 
     // ✅ Admin يقبل Vendor → يضاف لجدول Users ويحذف من VendorsApproval
     public bool AcceptVendor(string vendorId)
+{
+    using var conn = Database.GetConnection();
+    conn.Open();
+
+    string sql = "SELECT * FROM VendorsApproval WHERE Id=@Id LIMIT 1";
+    using var cmd = new SqliteCommand(sql, conn);
+    cmd.Parameters.AddWithValue("@Id", vendorId);
+    using var reader = cmd.ExecuteReader();
+
+    if (reader.Read())
     {
-        using var conn = Database.GetConnection();
-        conn.Open();
+        string id = reader.GetString(reader.GetOrdinal("Id"));
+        string email = reader.GetString(reader.GetOrdinal("Email"));
+        string passwordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
+        string name = reader.GetString(reader.GetOrdinal("Name"));
+        string createdAt = reader.GetString(reader.GetOrdinal("CreatedAt"));
 
-        string sql = "SELECT * FROM VendorsApproval WHERE Id=@Id LIMIT 1";
-        using var cmd = new SqliteCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@Id", vendorId);
-        using var reader = cmd.ExecuteReader();
+        // ⚠️ سكّر الـ reader قبل أي Query جديدة
+        reader.Close();
 
-        if (reader.Read())
+        // أضف لجدول Users كـ Vendor
+        bool added = _userRepo.AddUser(
+            id,
+            email,
+            passwordHash,
+            "Vendor",
+            name,
+            DateTime.Parse(createdAt)
+        );
+
+        if (!added)
         {
-            string id = reader.GetString(reader.GetOrdinal("Id"));
-            string email = reader.GetString(reader.GetOrdinal("Email"));
-            string passwordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
-            string name = reader.GetString(reader.GetOrdinal("Name"));
-            string createdAt = reader.GetString(reader.GetOrdinal("CreatedAt"));
-
-            // أضف لجدول Users كـ Vendor
-            _userRepo.AddUser(id, email, passwordHash, "Vendor", name, DateTime.Parse(createdAt));
-
-            reader.Close();
-
-            // احذف من جدول VendorsApproval
-            string deleteSql = "DELETE FROM VendorsApproval WHERE Id=@Id";
-            using var deleteCmd = new SqliteCommand(deleteSql, conn);
-            deleteCmd.Parameters.AddWithValue("@Id", vendorId);
-            deleteCmd.ExecuteNonQuery();
-
-            return true;
+            Console.WriteLine("❌ Failed to insert user (maybe duplicate email/id).");
+            return false;
         }
 
-        return false;
+        // احذف من جدول VendorsApproval
+        string deleteSql = "DELETE FROM VendorsApproval WHERE Id=@Id";
+        using var deleteCmd = new SqliteCommand(deleteSql, conn);
+        deleteCmd.Parameters.AddWithValue("@Id", vendorId);
+        deleteCmd.ExecuteNonQuery();
+
+        return true;
     }
+
+    return false;
+}
+
 
     // ❌ Admin يرفض Vendor → يحذف من جدول VendorsApproval فقط
     public bool RejectVendor(string vendorId)

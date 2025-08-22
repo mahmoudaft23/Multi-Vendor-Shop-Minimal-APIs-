@@ -19,18 +19,32 @@ CREATE TABLE IF NOT EXISTS Vendor (
         cmd.ExecuteNonQuery();
     }
 
-    public void AddVendor(string id, string ownerUserId, string name, string? description, DateTime createdAt)
+    public bool AddVendor(string id, string ownerUserId, string name, string? description, DateTime createdAt)
+{
+    try
     {
         using var connection = Database.GetConnection();
+        connection.Open();
+
         const string sql = @"
 INSERT INTO Vendor (Id, OwnerUserId, Name, Description, CreatedAt)
 VALUES (@Id, @OwnerUserId, @Name, @Description, @CreatedAt);";
+
         using var cmd = new SqliteCommand(sql, connection);
         cmd.Parameters.AddWithValue("@Id", id);
         cmd.Parameters.AddWithValue("@OwnerUserId", ownerUserId);
         cmd.Parameters.AddWithValue("@Name", name);
         cmd.Parameters.AddWithValue("@Description", (object?)description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@CreatedAt", createdAt.ToString("yyyy-MM-dd HH:mm:ss"));
-        cmd.ExecuteNonQuery();
+
+        int rowsAffected = cmd.ExecuteNonQuery();
+        return rowsAffected > 0; // ✅ true إذا أضاف صف واحد على الأقل
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error inserting vendor: {ex.Message}");
+        return false; // ❌ صار خطأ
+    }
+}
+
 }

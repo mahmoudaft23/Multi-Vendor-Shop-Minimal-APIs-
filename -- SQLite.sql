@@ -1,3 +1,10 @@
 -- SQLite
-INSERT INTO HrEmployees (Id, Name, Email, Phone, PasswordHash, CreatedAt) 
-VALUES ('hr2', 'Ali ', 'HRali@example.com', '05912d34567', 'hasheddpass', datetime('now'));
+INSERT INTO VendorsApproval (Id, Name, CreatedAt, Status, Email, PasswordHash) 
+VALUES (
+    'v12345', 
+    'Vendor Test', 
+    datetime('now'), 
+    'wait', 
+    'vendor@test.com', 
+    'hashedpassword123'
+);
