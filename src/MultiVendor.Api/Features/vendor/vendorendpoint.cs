@@ -24,8 +24,22 @@ public static class VendorEndpoints
            var result= vendor.getvendorbyid(ownerid,id);
             return Results.Json(result);
         });
-
+        group.MapPatch("/vendor/{ownerid}/{id}", (string ownerid,string id ,[FromBody] UpdateVendorDto vendordto,[FromServices]FetureVendor vendor ) =>
+        {       
+            
+             var result= vendor.UpdateVendorById(id,ownerid,vendordto.name,vendordto.description);
+             return result ? Results.Ok("updated") : Results.Unauthorized();
+          
+        });
+        group.MapDelete("/vendor/{ownerid}/{id}", (string ownerid,string id ,[FromServices]FetureVendor vendor ) =>
+        {       
+            
+             var result= vendor.DeleteVendorById(id,ownerid);
+             return result ? Results.Ok("Delete") : Results.Unauthorized();
+          
+        });
         return group;
     }
 }
 public record VendorDto(string OwnerUserId,string name, string description);
+public record UpdateVendorDto(string? name, string? description);

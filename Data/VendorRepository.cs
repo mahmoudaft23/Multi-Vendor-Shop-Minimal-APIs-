@@ -109,6 +109,71 @@ public vendorglobaldto? GetVendorByIdAndOwner(string vendorId, string ownerUserI
 
     return null; // إذا ما لقي Vendor يخص هذا Owner
 }
+public bool UpdateVendor(string id, string ownerUserId, string? name, string? description)
+{
+    try
+    {
+        using var connection = Database.GetConnection();
+        connection.Open();
+
+        var updates = new List<string>();
+
+        if (!string.IsNullOrEmpty(name))
+            updates.Add("Name = @Name");
+        if (!string.IsNullOrEmpty(description))
+            updates.Add("Description = @Description");
+
+        if (updates.Count == 0)
+            return false;
+
+        string sql = $@"
+            UPDATE Vendor 
+            SET {string.Join(", ", updates)} 
+            WHERE Id = @VendorId AND OwnerUserId = @OwnerUserId;";
+
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@VendorId", id);
+        cmd.Parameters.AddWithValue("@OwnerUserId", ownerUserId);
+
+        if (!string.IsNullOrEmpty(name))
+            cmd.Parameters.AddWithValue("@Name", name);
+        if (!string.IsNullOrEmpty(description))
+            cmd.Parameters.AddWithValue("@Description", description);
+
+        int rowsAffected = cmd.ExecuteNonQuery();
+        return rowsAffected > 0;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error updating vendor: {ex.Message}");
+        return false;
+    }
+}
+
+public bool DeleteVendorByIdAndOwner(string vendorId, string ownerUserId)
+{
+    try
+    {
+        using var connection = Database.GetConnection();
+        connection.Open();
+
+        const string sql = @"DELETE FROM Vendor 
+                             WHERE Id = @VendorId AND OwnerUserId = @OwnerUserId;";
+
+        using var cmd = new SqliteCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@VendorId", vendorId);
+        cmd.Parameters.AddWithValue("@OwnerUserId", ownerUserId);
+
+        int rowsAffected = cmd.ExecuteNonQuery();
+        return rowsAffected > 0;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error deleting vendor: {ex.Message}");
+        return false;
+    }
+}
+
 
 }
 
