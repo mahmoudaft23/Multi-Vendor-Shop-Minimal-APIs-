@@ -12,8 +12,18 @@ public static class VendorEndpoints
         });
 
 
-       
+        group.MapGet("/vendors/{id}", (string id ,[FromServices]FetureVendor vendor ) =>
+        {       
 
+           var result= vendor.getvendors(id);
+            return Results.Ok(result);
+        });
+         group.MapGet("/vendor/{ownerid}/{id}", (string ownerid,string id ,[FromServices]FetureVendor vendor ) =>
+        {       
+
+           var result= vendor.getvendorbyid(ownerid,id);
+            return Results.Json(result);
+        });
 
         return group;
     }

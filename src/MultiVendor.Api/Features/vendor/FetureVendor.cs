@@ -19,5 +19,17 @@ public class FetureVendor
 
 
     }
+    public List<vendorglobaldto> getvendors(string ownerid){
+
+        return _repoVendor.GetVendorsByOwnerId(ownerid);
+
+
+    }
+    public vendorglobaldto getvendorbyid(string ownerid,string id){
+
+        return _repoVendor.GetVendorByIdAndOwner(id,ownerid);
+
+
+    }
 }
    

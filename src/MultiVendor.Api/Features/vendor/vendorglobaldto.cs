@@ -1,4 +1,4 @@
-public class VendorDto
+public class vendorglobaldto
 {
     public required string Id { get; set; }
      public required string OwnerUserId { get; set; }
