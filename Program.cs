@@ -2,9 +2,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddSingleton<JwtService>();
 builder.Services.AddSingleton<UserRepository>();
 builder.Services.AddSingleton<VendorApprovalRepository>();
 builder.Services.AddSingleton<HrEmployeeRepository>();
@@ -14,6 +18,22 @@ builder.Services.AddSingleton<FetureVendor>();
 builder.Services.AddSingleton<CreatuserService>();
 builder.Services.AddSingleton<VendorRepository>();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -24,8 +44,12 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Example API with Swagger in ASP.NET Core"
     });
 });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

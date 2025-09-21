@@ -7,7 +7,7 @@ public static class HrEndpoints
         group.MapGet("/vendorstatus", ([FromServices] FetureHR hr) =>
         {
             return Results.Ok(hr.AllVendors());
-        });
+        }).RequireAuthorization();
 
 
        group.MapPatch("/vendorstatus/{id}", 

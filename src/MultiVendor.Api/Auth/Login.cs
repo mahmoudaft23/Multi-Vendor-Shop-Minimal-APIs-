@@ -2,12 +2,12 @@ public static class AuthEndpoints
 {
     public static RouteGroupBuilder MapAuthEndpoints(this RouteGroupBuilder group)
     {
-        group.MapPost("/login", (LoginDto dto, AuthService auth) =>
+        group.MapPost("/login", (LoginDto dto, AuthService auth, JwtService jwt) =>
         {
              var result = auth.VerifyLogin(dto.email, dto.passwordHash);
-
+              var token = jwt.GenerateJwtToken(dto.email);   
     return result.Check
-        ? Results.Ok(new { message = "Login OK", links = result.Links })
+        ? Results.Ok(new { token })
         : Results.Unauthorized();
         })
         .AddEndpointFilter(async (context, next) =>
