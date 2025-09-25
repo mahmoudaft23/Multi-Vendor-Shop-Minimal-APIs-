@@ -5,7 +5,7 @@ public static class AuthEndpoints
         group.MapPost("/login", (LoginDto dto, AuthService auth, JwtService jwt) =>
         {
              var result = auth.VerifyLogin(dto.email, dto.passwordHash);
-              var token = jwt.GenerateJwtToken(dto.email);   
+              var token = jwt.GenerateJwtToken(dto.email,result.role);   
     return result.Check
         ? Results.Ok(new { token })
         : Results.Unauthorized();

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 public static class HrEndpoints
 {
@@ -7,7 +8,7 @@ public static class HrEndpoints
         group.MapGet("/vendorstatus", ([FromServices] FetureHR hr) =>
         {
             return Results.Ok(hr.AllVendors());
-        }).RequireAuthorization();
+        }).RequireAuthorization(new AuthorizeAttribute { Roles = "HR" });
 
 
        group.MapPatch("/vendorstatus/{id}", 

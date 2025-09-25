@@ -22,7 +22,8 @@ public LoginResponse VerifyLogin(string email, string passwordHash)
             new[]
             {
                 new { rel = "vendorstatus", href = "/api/v1/auth/HR/stute/vendor" }
-            }
+            },
+            "HR"
         );
     }
     else
@@ -34,7 +35,8 @@ public LoginResponse VerifyLogin(string email, string passwordHash)
             new[]
             {
                 new { rel = "profile", href = "/api/users/me" }
-            }
+            },
+            "sss"
         );
     }
 }
@@ -45,4 +47,4 @@ public LoginResponse VerifyLogin(string email, string passwordHash)
         return _repo.UserExistsByEmail(email);
     }
 }
-public record LoginResponse(bool Check, object Links);
+public record LoginResponse(bool Check, object Links,string role );
