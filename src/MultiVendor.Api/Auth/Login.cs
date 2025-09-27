@@ -5,10 +5,12 @@ public static class AuthEndpoints
         group.MapPost("/login", (LoginDto dto, AuthService auth, JwtService jwt) =>
         {
              var result = auth.VerifyLogin(dto.email, dto.passwordHash);
-              var token = jwt.GenerateJwtToken(dto.email,result.role);   
-    return result.Check
-        ? Results.Ok(new { token })
-        : Results.Unauthorized();
+              var token = jwt.GenerateJwtToken(dto.email,result.Check);   
+              if(result.Check!=null){
+                return Results.Ok(new { token });
+              }
+              
+        return Results.Unauthorized();
         })
         .AddEndpointFilter(async (context, next) =>
         {

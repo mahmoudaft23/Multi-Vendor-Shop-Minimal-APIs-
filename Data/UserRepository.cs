@@ -130,22 +130,31 @@ public class UserRepository
         return result != null;
     }
 
-    // ✅ Check/Verify: التحقق من بيانات الدخول (Email + PasswordHash)
-    public bool VerifyCredentials(string email, string passwordHash)
+    
+    public string VerifyCredentials(string email, string passwordHash)
+{
+    using var connection = Database.GetConnection();
+    connection.Open();
+
+    string query = @"SELECT Role 
+                     FROM Users 
+                     WHERE Email = @Email AND PasswordHash = @PasswordHash
+                     LIMIT 1";
+
+    using var cmd = new SqliteCommand(query, connection);
+    cmd.Parameters.AddWithValue("@Email", email);
+    cmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
+
+    var result = cmd.ExecuteScalar();
+
+    if (result != null)
     {
-        using var connection = Database.GetConnection();
-        connection.Open();
-
-        string query = @"SELECT 1 FROM Users 
-                         WHERE Email = @Email AND PasswordHash = @PasswordHash
-                         LIMIT 1";
-        using var cmd = new SqliteCommand(query, connection);
-        cmd.Parameters.AddWithValue("@Email", email);
-        cmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
-
-        var result = cmd.ExecuteScalar();
-        return result != null;
+        return result.ToString(); 
     }
+
+    return null;
+}
+
 
     // (اختياري) جلب دور المستخدم عبر البريد — مفيد للتفويض
     public string? GetUserRoleByEmail(string email)

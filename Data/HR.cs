@@ -128,21 +128,27 @@ public class HrEmployeeRepository
         var result = cmd.ExecuteScalar();
         return result != null;
     }
+public string VerifyCredentials(string email, string passwordHash)
+{
+    using var connection = Database.GetConnection();
+    connection.Open();
 
-    // 🔐 التحقق من بيانات الدخول
-    public bool VerifyCredentials(string email, string passwordHash)
+    string query = @"SELECT 1 FROM HrEmployees 
+                     WHERE Email = @Email AND PasswordHash = @PasswordHash
+                     LIMIT 1";
+
+    using var cmd = new SqliteCommand(query, connection);
+    cmd.Parameters.AddWithValue("@Email", email);
+    cmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
+
+    var result = cmd.ExecuteScalar();
+
+    if (result != null)
     {
-        using var connection = Database.GetConnection();
-        connection.Open();
-
-        string query = @"SELECT 1 FROM HrEmployees 
-                         WHERE Email = @Email AND PasswordHash = @PasswordHash
-                         LIMIT 1";
-        using var cmd = new SqliteCommand(query, connection);
-        cmd.Parameters.AddWithValue("@Email", email);
-        cmd.Parameters.AddWithValue("@PasswordHash", passwordHash);
-
-        var result = cmd.ExecuteScalar();
-        return result != null;
+        return "hr";  
     }
+
+    return null; 
+}
+
 }

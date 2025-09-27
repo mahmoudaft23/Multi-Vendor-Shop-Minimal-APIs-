@@ -16,7 +16,7 @@ public static class HrEndpoints
     {
         bool result = hr.updatestuts(id, statusdto.status);
         return result ? Results.Ok("done") : Results.Unauthorized();
-    });
+    }).RequireAuthorization(new AuthorizeAttribute { Roles = "HR" });
 
 
         return group;
